@@ -4,7 +4,10 @@ import random
 
 # Constants
 CARD_VALUES = list(range(1, 14))  # Ace = 1, King = 13
-NUM_PLAYERS = 4
+NUM_PLAYERS = 2
+# Max possible 11
+HALF_POT=9
+K=7
 
 def draw_card(deck):
     """Draw a card from the deck. Refill and shuffle if empty."""
@@ -19,7 +22,10 @@ def choose_bet_amount(window_size, pot):
     Larger window => more confident => higher bet.
     Scaled linearly, capped at pot size.
     """
-    return pot
+    if window_size <= HALF_POT:
+        return pot/2
+    else:
+        return pot
     # max_window = 11  # Maximum possible in-between window (e.g., 1 and 13)
     # bet = 20
     # # bet = int((window_size / max_window) * pot)
@@ -84,7 +90,7 @@ def simulate_multiplayer_game(num_deck_cycles=1000, k=3, initial_pot=0):
             if pot == 0:
                 print("pot is zero")
                 continue
-            if window <= k or pot == 0:
+            if window <= k:
                 for p in range(NUM_PLAYERS):
                     balance_history[p].append(player_balances[p])
                 continue
@@ -111,7 +117,7 @@ def simulate_multiplayer_game(num_deck_cycles=1000, k=3, initial_pot=0):
                 balance_history[p].append(player_balances[p])
 
             CURRENT_PLAYER += 1
-            CURRENT_PLAYER = CURRENT_PLAYER % 4
+            CURRENT_PLAYER = CURRENT_PLAYER % NUM_PLAYERS
 
         for p in range(NUM_PLAYERS):
             end_balance_history[p].append(player_balances[p])
@@ -138,7 +144,7 @@ def simulate_multiplayer_game(num_deck_cycles=1000, k=3, initial_pot=0):
 
 # Run the simulation
 if __name__ == "__main__":
-    history, end_balance_history, results = simulate_multiplayer_game(num_deck_cycles=100000, k=7, initial_pot=0)
+    history, end_balance_history, results = simulate_multiplayer_game(num_deck_cycles=200000, k=K, initial_pot=0)
     for player, stats in results.items():
         if player == "Final Pot":
             print(f"Final pot: {stats}")
